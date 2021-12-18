@@ -1,0 +1,55 @@
+JNDI  Java Naming Directory Interface
+
+here we store the database info in xml format class.forname, dburl,dbpass,dbuser
+
+Every time we call a servlet we are connecting to the database again and again this will 
+increase the load on the data and it will stop responding. TO reduce the load we put the database info in xml format
+
+the details of the database can be edited easily and less tedious
+
+
+1. edit server.xml in Servers folder in workspace, add
+<GlobalNamingResources>
+    <!-- Editable user database that can also be used by
+         UserDatabaseRealm to authenticate users
+    -->
+    <GlobalNamingResources>
+    <!-- Editable user database that can also be used by
+         UserDatabaseRealm to authenticate users
+    -->
+    <Resource name="jdbc/MyDB" 
+      global="jdbc/MyDB" 
+      auth="Container" 
+      type="javax.sql.DataSource" 
+      driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver" 
+      url="jdbc:sqlserver://localhost:64101;databaseName=MyDB" 
+      username="sa" 
+      password="123" 
+      
+      maxActive="100" 
+      maxIdle="20" 
+      minIdle="5" 
+      maxWait="10000"/>
+  </GlobalNamingResources>
+  
+  
+2. edir context.xml in Servers folder in workspace
+
+	
+
+<ResourceLink name="jdbc/MyLocalDB"
+                global="jdbc/MyDB"
+                auth="Container"
+                type="javax.sql.DataSource" />
+                
+                
+3. Modify servlets which are connecting to DB, write the following 
+			
+			import javax.sql.DataSource;
+			.	
+			.
+			.
+			.
+			Context ctx = new InitialContext();
+			DataSource ds = (DataSource)ctx.lookup("java:/comp/env/jdbc/MyLocalDB"); //connect to local DB in context.xml
+			Connection con = ds.getConnection();
